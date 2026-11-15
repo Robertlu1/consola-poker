@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es-VE">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -19,6 +19,7 @@
     <div class="max-w-md mx-auto w-full flex-grow flex flex-col fade-in">
         <!-- Cabecera -->
         <div class="text-center mb-4 relative">
+            <!-- Selector de Idioma Flotante -->
             <select id="langSelect" class="absolute top-0 right-0 bg-[#1c2541] border border-blue-500 text-white px-2 py-1 rounded-lg text-xs outline-none cursor-pointer" onchange="changeLanguage()">
                 <option value="es">🇪🇸 ES</option>
                 <option value="en">🇬🇧 EN</option>
@@ -28,38 +29,31 @@
             <p id="txtSubtitle" class="text-xs text-gray-400">Analizador Privado de Póker</p>
             
             <div class="inline-flex items-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold mt-2" id="txtStatus">
-                <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block mr-2 shadow-[0_0_8px_#2ec4b6]"></span> Canal Seguro Activo
+                <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block mr-2 shadow-[0_0_8px_#2ec4b6]"></span> PC Conectada y en Escucha
             </div>
         </div>
 
-        <!-- Botón de Disparo Directo a Cámara (Forzado por Hardware Nativo) -->
-        <label for="nativeCamera" class="glass-panel rounded-2xl p-6 text-center cursor-pointer mb-4 transition-all duration-300 active:scale-95 border-dashed border-2 border-blue-500 block shadow-lg">
-            <i class="fa-solid fa-camera text-4xl text-blue-400 mb-2"></i>
-            <h3 id="txtCamTitle" class="text-sm font-bold text-white mb-1">Activar Cámara Directa</h3>
-            <p id="txtCamSub" class="text-xs text-gray-400">Capturar jugada al instante</p>
+        <!-- Tarjeta de captura directa con cámara trasera -->
+        <label for="cameraInput" class="glass-panel rounded-2xl p-5 text-center cursor-pointer mb-4 transition-all duration-300 active:scale-95 border-dashed border-2 border-blue-500 block">
+            <i class="fa-solid fa-camera-retro text-3xl text-blue-400 mb-2"></i>
+            <h3 id="txtCamTitle" class="text-sm font-bold text-white mb-1">Toca aquí para abrir la cámara</h3>
+            <p id="txtCamSub" class="text-xs text-gray-400">Toma la foto de la mesa o mano actual</p>
         </label>
         
-        <!-- Input nativo con atributos estrictos de cámara -->
-        <input type="file" id="nativeCamera" accept="image/*" capture="camera" style="display: none;" onchange="handleImage(event)">
+        <!-- Input con capture="environment" para abrir la cámara trasera del dispositivo móvil -->
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
 
-        <!-- Visor de la Captura -->
-        <div class="glass-panel rounded-2xl p-3 mb-4 relative overflow-hidden flex flex-col items-center justify-center min-h-[160px]">
-            <img id="snapshotPreview" alt="Captura de Mesa" class="w-full h-44 object-cover rounded-xl hidden">
-            <div id="placeholderView" class="text-center text-gray-400 text-xs py-6">
-                <i class="fa-solid fa-image text-2xl text-slate-600 mb-2"></i>
-                <p id="txtWaiting">Ninguna imagen capturada aún.<br>Usa el botón superior para abrir la cámara.</p>
-            </div>
-        </div>
-
-        <!-- Registro de Análisis -->
+        <!-- Registro de Análisis / Visor -->
         <div class="glass-panel rounded-2xl p-4 flex-grow flex flex-col mb-4">
-            <div id="txtLogTitle" class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-2">Registro de Análisis</div>
-            <div id="logBox" class="bg-[#0b132b] rounded-xl p-3 flex-grow flex flex-col items-center justify-center text-center text-gray-400 text-xs">
-                <span id="txtLogSub">Esperando transmisión de datos...</span>
+            <div id="txtLogTitle" class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-3">Registro de Análisis</div>
+            <div id="logBox" class="bg-[#0b132b] rounded-xl p-4 flex-grow flex flex-col items-center justify-center text-center text-gray-400 text-xs min-h-[140px]">
+                <i class="fa-solid fa-brain text-2xl text-slate-600 mb-2"></i>
+                <span id="txtWaiting">Esperando captura de pantalla...<br>Sube una imagen para activar el análisis unísono.</span>
             </div>
         </div>
 
-        <button id="btnClose" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg w-full text-sm transition active:opacity-90" onclick="window.close()">
+        <!-- Botón inferior para cerrar o salir -->
+        <button id="btnClose" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg w-full text-sm transition active:opacity-90" onclick="window.close()">
             Cerrar Consola
         </button>
     </div>
@@ -69,24 +63,22 @@
             es: {
                 title: "Consola Táctica IA",
                 subtitle: "Analizador Privado de Póker",
-                status: "Canal Seguro Activo",
-                camTitle: "Activar Cámara Directa",
-                camSub: "Capturar jugada al instante",
+                status: "PC Conectada y en Escucha",
+                camTitle: "Toca aquí para abrir la cámara",
+                camSub: "Toma la foto de la mesa o mano actual",
                 logTitle: "Registro de Análisis",
-                waiting: "Ninguna imagen capturada aún.<br>Usa el botón superior para abrir la cámara.",
-                analyzing: "Procesando fotograma táctico...",
-                success: "Fotograma recibido correctamente. Matriz lista."
+                waiting: "Esperando captura de pantalla...<br>Sube una imagen para activar el análisis unísono.",
+                analyzing: "Procesando captura con las IAs..."
             },
             en: {
                 title: "AI Tactical Console",
                 subtitle: "Private Poker Analyzer",
-                status: "Secure Channel Active",
-                camTitle: "Activate Direct Camera",
-                camSub: "Capture play instantly",
+                status: "PC Connected & Listening",
+                camTitle: "Tap here to open camera",
+                camSub: "Take a photo of the current table or hand",
                 logTitle: "Analysis Log",
-                waiting: "No image captured yet.<br>Use the button above to open camera.",
-                analyzing: "Processing tactical frame...",
-                success: "Frame received successfully. Matrix ready."
+                waiting: "Waiting for screenshot...<br>Upload an image to trigger the joint analysis.",
+                analyzing: "Processing capture with AIs..."
             }
         };
 
@@ -98,36 +90,34 @@
             document.getElementById('txtCamTitle').innerText = texts[lang].camTitle;
             document.getElementById('txtCamSub').innerText = texts[lang].camSub;
             document.getElementById('txtLogTitle').innerText = texts[lang].logTitle;
-            document.getElementById('txtWaiting').innerHTML = texts[lang].waiting;
+            
+            const logBox = document.getElementById('logBox');
+            if(logBox.dataset.state !== "processing") {
+                logBox.innerHTML = `<i class="fa-solid fa-brain text-2xl text-slate-600 mb-2"></i> <span id="txtWaiting">${texts[lang].waiting}</span>`;
+            }
             document.getElementById('btnClose').innerText = (lang === 'es') ? "Cerrar Consola" : "Close Console";
         }
 
-        function handleImage(event) {
+        const cameraInput = document.getElementById('cameraInput');
+        const logBox = document.getElementById('logBox');
+
+        cameraInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             const currentLang = document.getElementById('langSelect').value;
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const preview = document.getElementById('snapshotPreview');
-                    const placeholder = document.getElementById('placeholderView');
-                    const logBox = document.getElementById('logBox');
-
-                    preview.src = e.target.result;
-                    preview.style.display = "block";
-                    placeholder.style.display = "none";
-
+                    logBox.dataset.state = "processing";
                     logBox.innerHTML = `
-                        <div class="text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 mb-1">
-                            <i class="fa-solid fa-circle-check"></i> ${texts[currentLang].analyzing}
-                        </div>
-                        <div class="text-[11px] text-gray-300">
-                            ${texts[currentLang].success}
+                        <img src="${e.target.result}" alt="Captured Hand" class="max-w-full max-h-36 rounded-lg mb-2 object-contain">
+                        <div class="text-emerald-400 font-bold mt-1 text-xs flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-spinner fa-spin"></i> ${texts[currentLang].analyzing}
                         </div>
                     `;
                 }
                 reader.readAsDataURL(file);
             }
-        }
+        });
     </script>
 </body>
 </html>
