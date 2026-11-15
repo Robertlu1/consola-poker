@@ -3,82 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Consola Táctica IA - Póker</title>
+    <title>Consola Táctica IA - Sala Privada</title>
     <!-- Iconos de FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0b132b; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow-x: hidden; }
-        .glass-panel { background: rgba(28, 37, 65, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(58, 134, 255, 0.3); }
-        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0b132b;
+            color: #ffffff;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .lang-selector {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #1c2541;
+            border: 1px solid #3a86ff;
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: #8d99ae;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(0, 255, 128, 0.1);
+            border: 1px solid rgba(0, 255, 128, 0.3);
+            color: #2ec4b6;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-badge span {
+            width: 8px;
+            height: 8px;
+            background-color: #2ec4b6;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            box-shadow: 0 0 8px #2ec4b6;
+        }
+
+        /* Contenedor de transmisión y cámara real */
+        .stream-container {
+            background: #1c2541;
+            border: 2px solid #3a86ff;
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stream-container video, .stream-container img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #0b132b;
+            display: none;
+        }
+
+        .capture-card {
+            background: linear-gradient(135deg, #1c2541 0%, #0b132b 100%);
+            border: 2px dashed #3a86ff;
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .capture-card:active {
+            transform: scale(0.98);
+            border-color: #4ea8de;
+        }
+
+        .capture-card i {
+            font-size: 2.5rem;
+            color: #4ea8de;
+            margin-bottom: 10px;
+        }
+
+        .capture-card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            color: #ffffff;
+        }
+
+        .capture-card p {
+            font-size: 0.75rem;
+            color: #8d99ae;
+        }
+
+        /* Registro de transmisión en vivo */
+        .log-section {
+            background-color: #1c2541;
+            border-radius: 16px;
+            padding: 15px;
+            flex-grow: 1;
+            border: 1px solid #334155;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8d99ae;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .log-content {
+            background-color: #0b132b;
+            border-radius: 10px;
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #8d99ae;
+            font-size: 0.85rem;
+            min-height: 100px;
+        }
+
+        .btn-close {
+            background: linear-gradient(135deg, #3a86ff 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+            text-align: center;
+        }
+
+        .btn-close:active {
+            opacity: 0.9;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-4 relative">
+<body>
 
-    <div class="max-w-md mx-auto w-full flex-grow flex flex-col fade-in">
-        <!-- Cabecera -->
-        <div class="text-center mb-4 relative">
-            <!-- Selector de Idioma Flotante -->
-            <select id="langSelect" class="absolute top-0 right-0 bg-[#1c2541] border border-blue-500 text-white px-2 py-1 rounded-lg text-xs outline-none cursor-pointer" onchange="changeLanguage()">
-                <option value="es">🇪🇸 ES</option>
-                <option value="en">🇬🇧 EN</option>
-            </select>
+    <div class="header">
+        <select id="langSelect" class="lang-selector" onchange="changeLanguage()">
+            <option value="es">🇪🇸 ES</option>
+            <option value="en">🇬🇧 EN</option>
+        </select>
 
-            <h1 id="txtTitle" class="text-xl font-bold tracking-wider mb-1">Consola Táctica IA</h1>
-            <p id="txtSubtitle" class="text-xs text-gray-400">Analizador Privado de Póker</p>
-            
-            <div class="inline-flex items-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold mt-2" id="txtStatus">
-                <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block mr-2 shadow-[0_0_8px_#2ec4b6]"></span> PC Conectada y en Escucha
-            </div>
+        <h1 id="txtTitle">Consola Táctica IA</h1>
+        <p id="txtSubtitle">Canal Privado y Seguro</p>
+        <div class="status-badge" id="txtStatus">
+            <span></span> Sala Virtual Activa en Telegram
         </div>
-
-        <!-- Tarjeta de captura directa con cámara trasera -->
-        <label for="cameraInput" class="glass-panel rounded-2xl p-5 text-center cursor-pointer mb-4 transition-all duration-300 active:scale-95 border-dashed border-2 border-blue-500 block">
-            <i class="fa-solid fa-camera-retro text-3xl text-blue-400 mb-2"></i>
-            <h3 id="txtCamTitle" class="text-sm font-bold text-white mb-1">Toca aquí para abrir la cámara</h3>
-            <p id="txtCamSub" class="text-xs text-gray-400">Toma la foto de la mesa o mano actual</p>
-        </label>
-        
-        <!-- Input con capture="environment" para abrir la cámara trasera del dispositivo móvil -->
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
-
-        <!-- Registro de Análisis / Visor -->
-        <div class="glass-panel rounded-2xl p-4 flex-grow flex flex-col mb-4">
-            <div id="txtLogTitle" class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-3">Registro de Análisis</div>
-            <div id="logBox" class="bg-[#0b132b] rounded-xl p-4 flex-grow flex flex-col items-center justify-center text-center text-gray-400 text-xs min-h-[140px]">
-                <i class="fa-solid fa-brain text-2xl text-slate-600 mb-2"></i>
-                <span id="txtWaiting">Esperando captura de pantalla...<br>Sube una imagen para activar el análisis unísono.</span>
-            </div>
-        </div>
-
-        <!-- Botón inferior para cerrar o salir -->
-        <button id="btnClose" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg w-full text-sm transition active:opacity-90" onclick="window.close()">
-            Cerrar Consola
-        </button>
     </div>
+
+    <!-- Acceso directo a cámara real -->
+    <div class="capture-card" onclick="document.getElementById('cameraInput').click();">
+        <i class="fa-solid fa-video"></i>
+        <h3 id="txtCamTitle">Activar Cámara en Vivo</h3>
+        <p id="txtCamSub">Transmisión directa desde tu dispositivo</p>
+    </div>
+    
+    <!-- Input multimedia real para hardware de cámara y archivos -->
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+
+    <div class="stream-container">
+        <video id="liveVideo" autoplay playsinline></video>
+        <img id="capturedImage" alt="Feed en Vivo">
+    </div>
+
+    <div class="log-section">
+        <div class="log-title" id="txtLogTitle">Estado de la Sala</div>
+        <div class="log-content" id="logBox">
+            <i class="fa-solid fa-signal" style="font-size: 1.8rem; color: #2ec4b6; margin-bottom: 8px;"></i>
+            <span id="txtWaiting">Conectado al canal seguro.<br>Selecciona la cámara para iniciar el flujo de video.</span>
+        </div>
+    </div>
+
+    <button class="btn-close" id="btnClose" onclick="window.close()">Salir de la Sala</button>
 
     <script>
         const texts = {
             es: {
                 title: "Consola Táctica IA",
-                subtitle: "Analizador Privado de Póker",
-                status: "PC Conectada y en Escucha",
-                camTitle: "Toca aquí para abrir la cámara",
-                camSub: "Toma la foto de la mesa o mano actual",
-                logTitle: "Registro de Análisis",
-                waiting: "Esperando captura de pantalla...<br>Sube una imagen para activar el análisis unísono.",
-                analyzing: "Procesando captura con las IAs..."
+                subtitle: "Canal Privado y Seguro",
+                status: "Sala Virtual Activa en Telegram",
+                camTitle: "Activar Cámara en Vivo",
+                camSub: "Transmisión directa desde tu dispositivo",
+                logTitle: "Estado de la Sala",
+                waiting: "Conectado al canal seguro.<br>Selecciona la cámara para iniciar el flujo de video.",
+                active: "Transmisión activa y sincronizada con la red."
             },
             en: {
                 title: "AI Tactical Console",
-                subtitle: "Private Poker Analyzer",
-                status: "PC Connected & Listening",
-                camTitle: "Tap here to open camera",
-                camSub: "Take a photo of the current table or hand",
-                logTitle: "Analysis Log",
-                waiting: "Waiting for screenshot...<br>Upload an image to trigger the joint analysis.",
-                analyzing: "Processing capture with AIs..."
+                subtitle: "Private & Secure Channel",
+                status: "Virtual Room Active on Telegram",
+                camTitle: "Activate Live Camera",
+                camSub: "Direct stream from your device",
+                logTitle: "Room Status",
+                waiting: "Connected to secure channel.<br>Select camera to start video feed.",
+                active: "Live stream active and synchronized with network."
             }
         };
 
@@ -86,20 +255,20 @@
             const lang = document.getElementById('langSelect').value;
             document.getElementById('txtTitle').innerText = texts[lang].title;
             document.getElementById('txtSubtitle').innerText = texts[lang].subtitle;
-            document.getElementById('txtStatus').innerHTML = `<span class="w-2 h-2 bg-emerald-400 rounded-full inline-block mr-2 shadow-[0_0_8px_#2ec4b6]"></span> ${texts[lang].status}`;
+            document.getElementById('txtStatus').innerHTML = `<span></span> ${texts[lang].status}`;
             document.getElementById('txtCamTitle').innerText = texts[lang].camTitle;
             document.getElementById('txtCamSub').innerText = texts[lang].camSub;
             document.getElementById('txtLogTitle').innerText = texts[lang].logTitle;
             
             const logBox = document.getElementById('logBox');
-            if(logBox.dataset.state !== "processing") {
-                logBox.innerHTML = `<i class="fa-solid fa-brain text-2xl text-slate-600 mb-2"></i> <span id="txtWaiting">${texts[lang].waiting}</span>`;
+            if(logBox.dataset.state !== "active") {
+                logBox.innerHTML = `<i class="fa-solid fa-signal" style="font-size: 1.8rem; color: #2ec4b6; margin-bottom: 8px;"></i> ${texts[lang].waiting}`;
             }
-            document.getElementById('btnClose').innerText = (lang === 'es') ? "Cerrar Consola" : "Close Console";
         }
 
         const cameraInput = document.getElementById('cameraInput');
         const logBox = document.getElementById('logBox');
+        const capturedImage = document.getElementById('capturedImage');
 
         cameraInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -107,11 +276,16 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    logBox.dataset.state = "processing";
+                    logBox.dataset.state = "active";
+                    capturedImage.src = e.target.result;
+                    capturedImage.style.display = "block";
+                    
                     logBox.innerHTML = `
-                        <img src="${e.target.result}" alt="Captured Hand" class="max-w-full max-h-36 rounded-lg mb-2 object-contain">
-                        <div class="text-emerald-400 font-bold mt-1 text-xs flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-spinner fa-spin"></i> ${texts[currentLang].analyzing}
+                        <div style="color: #2ec4b6; font-weight: bold; margin-bottom: 4px;">
+                            <i class="fa-solid fa-circle-dot" style="color: #ff4d4d; animation: pulse 1.5s infinite;"></i> EN VIVO (Telegram Stream)
+                        </div>
+                        <div style="font-size: 0.8rem; color: #f8fafc;">
+                            ${texts[currentLang].active}
                         </div>
                     `;
                 }
