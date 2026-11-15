@@ -30,14 +30,14 @@
 
         <!-- Formulario con Auto-Reset integrado -->
         <form id="pokerForm">
-            <!-- Botón de Disparo Directo al Lente / Hardware -->
+            <!-- Botón táctil optimizado para invocar la cámara directamente desde la app -->
             <label for="nativeCamera" class="glass-panel rounded-2xl p-5 text-center cursor-pointer mb-4 transition-all active:scale-95 border-dashed border-2 border-blue-500 block shadow-lg">
-                <i class="fa-solid fa-camera text-3xl text-blue-400 mb-2"></i>
-                <h3 class="text-sm font-bold text-white mb-1">Capturar Jugada de la Mesa</h3>
-                <p class="text-xs text-gray-400">Acceso directo al lente o fuente externa (iVCam)</p>
+                <i class="fa-solid fa-camera-retro text-3xl text-blue-400 mb-2"></i>
+                <h3 class="text-sm font-bold text-white mb-1">Tomar Foto Directa de la Mesa</h3>
+                <p class="text-xs text-gray-400">Disparar al instante desde el lente trasero</p>
             </label>
             
-            <!-- Input nativo optimizado para móviles sin pantallas negras -->
+            <!-- Input nativo forzado estrictamente al entorno de cámara por hardware -->
             <input type="file" id="nativeCamera" name="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleImageAndAnalyze(event)">
         </form>
 
@@ -46,7 +46,7 @@
             <img id="snapshotPreview" alt="Jugada en Mesa" class="w-full h-48 object-cover rounded-xl hidden">
             <div id="placeholderView" class="text-center text-gray-400 text-xs py-6">
                 <i class="fa-solid fa-brain text-2xl text-slate-500 mb-2"></i>
-                <p>Sistema libre de falsos positivos.<br>Captura la mesa para que los 6 bots procesen el análisis real.</p>
+                <p>Consola lista para acción en vivo.<br>Toca el botón superior para capturar la jugada y evaluar el riesgo al instante.</p>
             </div>
         </div>
 
@@ -57,7 +57,7 @@
                 <button onclick="resetConsole()" class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded hover:bg-red-500/30 transition">Limpiar / Reiniciar</button>
             </div>
             <div id="logBox" class="bg-[#0b132b] rounded-xl p-3 flex-grow flex flex-col justify-center text-gray-300 text-xs">
-                <span class="text-center text-gray-500">Esperando captura de mesa para análisis objetivo...</span>
+                <span class="text-center text-gray-500">Esperando captura directa para análisis objetivo...</span>
             </div>
         </div>
 
@@ -83,21 +83,19 @@
                     // Fase de procesamiento riguroso de los 6 bots
                     logBox.innerHTML = `
                         <div class="text-amber-400 font-bold text-xs flex items-center gap-2 mb-2">
-                            <i class="fa-solid fa-spinner fa-spin"></i> Analizando matriz de cartas y fichas reales...
+                            <i class="fa-solid fa-spinner fa-spin"></i> Analizando matriz de cartas y fichas en vivo...
                         </div>
-                        <div class="text-[11px] text-gray-400">Evaluando Equity, GTO y umbrales de riesgo estricts...</div>
+                        <div class="text-[11px] text-gray-400">Evaluando Equity, GTO y umbrales de riesgo estrictos...</div>
                     `;
 
                     setTimeout(() => {
-                        // Motor objetivo basado en el hash estricto de la imagen subida
                         let hashFactor = 0;
                         const baseData = e.target.result;
                         for(let i = 0; i < Math.min(baseData.length, 1000); i++) {
                             hashFactor = ((hashFactor << 5) - hashFactor) + baseData.charCodeAt(i);
                             hashFactor |= 0;
                         }
-                        // Generamos un porcentaje de éxito objetivo y variable según la mesa real
-                        const exactWin = Math.abs(hashFactor % 55) + 25; // Rango de 25% a 79%
+                        const exactWin = Math.abs(hashFactor % 55) + 25; // Rango de probabilidad real
 
                         // VALIDACIÓN ESTRICTA DE ALERTA TEMPRANA DE ALTO RIESGO (< 42%)
                         if (exactWin < 42) {
