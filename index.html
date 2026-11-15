@@ -15,7 +15,7 @@
 
     <div class="max-w-md mx-auto w-full flex-grow flex flex-col">
         <!-- Cabecera -->
-        <div class="text-center mb-4">
+        <div class="text-center mb-4 relative">
             <h1 class="text-xl font-bold tracking-wider mb-1">Consola Táctica IA</h1>
             <p class="text-xs text-gray-400">Analizador Privado de Póker</p>
             
@@ -24,22 +24,22 @@
             </div>
         </div>
 
-        <!-- Botón Directo a la Cámara -->
+        <!-- Botón Único de Disparo Directo a Cámara -->
         <label for="nativeCamera" class="glass-panel rounded-2xl p-6 text-center cursor-pointer mb-4 transition-all active:scale-95 border-dashed border-2 border-blue-500 block shadow-lg">
             <i class="fa-solid fa-camera text-4xl text-blue-400 mb-2"></i>
             <h3 class="text-sm font-bold text-white mb-1">Abrir Cámara y Capturar Mesa</h3>
             <p class="text-xs text-gray-400">Acceso directo al lente por hardware</p>
         </label>
         
-        <!-- Input nativo oculto pero conectado al botón -->
+        <!-- Input nativo forzado estrictamente a la cámara trasera -->
         <input type="file" id="nativeCamera" accept="image/*" capture="environment" style="display: none;" onchange="handleImage(event)">
 
-        <!-- Visor de la Captura (Muestra la foto tomada, adiós pantalla negra) -->
-        <div class="glass-panel rounded-2xl p-3 mb-4 relative overflow-hidden flex flex-col items-center justify-center min-h-[200px]">
-            <img id="snapshotPreview" alt="Captura de Mesa" class="w-full h-52 object-cover rounded-xl hidden">
-            <div id="placeholderView" class="text-center text-gray-400 text-xs py-8">
+        <!-- Visor de la Captura Real -->
+        <div class="glass-panel rounded-2xl p-3 mb-4 relative overflow-hidden flex flex-col items-center justify-center min-h-[180px]">
+            <img id="snapshotPreview" alt="Captura de Mesa" class="w-full h-48 object-cover rounded-xl hidden">
+            <div id="placeholderView" class="text-center text-gray-400 text-xs py-6">
                 <i class="fa-solid fa-image text-3xl text-slate-600 mb-2"></i>
-                <p>Presiona el botón superior para activar la cámara del dispositivo y capturar la jugada al instante.</p>
+                <p>Presiona el botón superior para activar la cámara del dispositivo y capturar la jugada.</p>
             </div>
         </div>
 
@@ -69,7 +69,7 @@
                         <div class="text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 mb-1">
                             <i class="fa-solid fa-circle-check"></i> Fotograma capturado con éxito
                         </div>
-                        <div class="text-[11px] text-gray-300">Matriz táctica cargada y lista en la consola.</div>
+                        <div class="text-[11px] text-gray-300">Matriz táctica cargada y lista para análisis.</div>
                     `;
                 }
                 reader.readAsDataURL(file);
