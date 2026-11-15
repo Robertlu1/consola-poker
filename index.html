@@ -28,16 +28,16 @@
             </div>
         </div>
 
-        <!-- Formulario con Disparador de Cámara Limpio -->
+        <!-- Botón de Disparador Directo de Cámara Forzada -->
         <form id="pokerForm">
             <label for="cameraInput" class="glass-panel rounded-2xl p-5 text-center cursor-pointer mb-4 transition-all active:scale-95 border-dashed border-2 border-blue-500 block shadow-lg">
                 <i class="fa-solid fa-camera text-3xl text-blue-400 mb-2"></i>
-                <h3 class="text-sm font-bold text-white mb-1">Tomar Foto de la Mesa al Instante</h3>
-                <p class="text-xs text-gray-400">Captura directa de la jugada sin visores muertos</p>
+                <h3 class="text-sm font-bold text-white mb-1">Abrir Cámara y Capturar Mesa</h3>
+                <p class="text-xs text-gray-400">Disparo directo al obturador de fotos</p>
             </label>
             
-            <!-- Input nativo de hardware forzado a la cámara -->
-            <input type="file" id="cameraInput" name="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleImageAndAnalyze(event)">
+            <!-- Input modificado con captura de hardware exclusiva de cámara -->
+            <input type="file" id="cameraInput" name="cameraInput" accept="image/*" capture="camera" style="display: none;" onchange="handleImageAndAnalyze(event)">
         </form>
 
         <!-- Visor Limpio de la Captura Real -->
@@ -45,7 +45,7 @@
             <img id="snapshotPreview" alt="Jugada en Mesa" class="w-full h-48 object-cover rounded-xl hidden">
             <div id="placeholderView" class="text-center text-gray-400 text-xs py-6">
                 <i class="fa-solid fa-brain text-2xl text-slate-500 mb-2"></i>
-                <p>Consola optimizada al 100%.<br>Toca el botón superior para disparar la foto de la jugada.</p>
+                <p>Consola optimizada para velocidad.<br>Toca el botón superior para abrir el obturador al instante.</p>
             </div>
         </div>
 
