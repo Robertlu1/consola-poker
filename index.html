@@ -2,84 +2,80 @@
 <html lang="es-VE">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Consola Táctica IA - Póker</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salón de Clases - CONFENACAPV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0b132b; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
-        .glass-panel { background: rgba(28, 37, 65, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(58, 134, 255, 0.3); }
+        body { background-color: #111827; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        .glass-panel { background: rgba(31, 41, 55, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-4 relative">
 
-    <div class="max-w-md mx-auto w-full flex-grow flex flex-col">
-        <!-- Cabecera -->
-        <div class="text-center mb-4 relative">
-            <select id="langSelect" class="absolute top-0 right-0 bg-[#1c2541] border border-blue-500 text-white px-2 py-1 rounded-lg text-xs outline-none cursor-pointer" onchange="changeLanguage()">
-                <option value="es">🇪🇸 ES</option>
-                <option value="en">🇬🇧 EN</option>
-            </select>
-
-            <h1 id="txtTitle" class="text-xl font-bold tracking-wider mb-1">Consola Táctica IA</h1>
-            <p id="txtSubtitle" class="text-xs text-gray-400">Analizador Privado de Póker</p>
-            
-            <div class="inline-flex items-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold mt-2">
-                <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block mr-2 shadow-[0_0_8px_#2ec4b6]"></span> Canal Seguro Activo
-            </div>
+    <div class="max-w-4xl mx-auto w-full flex-grow flex flex-col fade-in">
+        <!-- Cabecera de la Clase -->
+        <div class="text-center mb-6 mt-4">
+            <h1 class="text-2xl font-bold tracking-wider">Salón de Clases CONFENACAPV</h1>
+            <p id="nombreSalaTexto" class="text-indigo-400 text-sm font-semibold mt-1">Sala Oficial de Capacitación</p>
         </div>
 
-        <!-- Botón de Disparo Directo a Cámara -->
-        <label for="nativeCamera" class="glass-panel rounded-2xl p-6 text-center cursor-pointer mb-4 transition-all active:scale-95 border-dashed border-2 border-blue-500 block shadow-lg">
-            <i class="fa-solid fa-camera text-4xl text-blue-400 mb-2"></i>
-            <h3 id="txtCamTitle" class="text-sm font-bold text-white mb-1">Encender Cámara Trasera</h3>
-            <p id="txtCamSub" class="text-xs text-gray-400">Capturar jugada al instante</p>
-        </label>
-        
-        <!-- Input nativo forzado a hardware -->
-        <input type="file" id="nativeCamera" accept="image/*" capture="environment" style="display: none;" onchange="handleImage(event)">
-
-        <!-- Visor de la Captura -->
-        <div class="glass-panel rounded-2xl p-3 mb-4 relative overflow-hidden flex flex-col items-center justify-center min-h-[160px]">
-            <img id="snapshotPreview" alt="Captura de Mesa" class="w-full h-44 object-cover rounded-xl hidden">
-            <div id="placeholderView" class="text-center text-gray-400 text-xs py-6">
-                <i class="fa-solid fa-image text-2xl text-slate-600 mb-2"></i>
-                <p id="txtWaiting">Ninguna imagen capturada aún.<br>Usa el botón superior para activar la cámara.</p>
+        <!-- Panel de Control y Reglas de la Sala -->
+        <div class="glass-panel rounded-xl p-4 mb-6 text-xs text-gray-300 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div>
+                <span id="rolUsuarioTexto" class="font-semibold text-indigo-400 block mb-1">Normas de la Sala:</span>
+                <p>• Micrófonos silenciados al entrar.<br>• Use la función de levantar la mano para pedir la palabra en orden parlamentario.</p>
             </div>
+            <a href="index.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-center">
+                Volver a la App
+            </a>
         </div>
 
-        <!-- Registro de Análisis -->
-        <div class="glass-panel rounded-2xl p-4 flex-grow flex flex-col mb-4">
-            <div class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-2">Registro de Análisis</div>
-            <div id="logBox" class="bg-[#0b132b] rounded-xl p-3 flex-grow flex flex-col items-center justify-center text-center text-gray-400 text-xs">
-                <span>Esperando transmisión de datos...</span>
+        <!-- Contenedor del Botón de Videollamada -->
+        <div class="glass-panel rounded-xl overflow-hidden shadow-2xl flex-grow flex flex-col min-h-[400px] relative border border-indigo-500/30 p-6 items-center justify-center">
+            <div id="meet" class="w-full h-full flex flex-col items-center justify-center text-center">
+                <!-- Se inyecta directamente -->
             </div>
         </div>
-
-        <button class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg w-full text-sm" onclick="window.close()">
-            Cerrar Consola
-        </button>
     </div>
 
+    <!-- Script de integración Jitsi Meet -->
     <script>
-        function handleImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('snapshotPreview').src = e.target.result;
-                    document.getElementById('snapshotPreview').style.display = "block";
-                    document.getElementById('placeholderView').style.display = "none";
-                    document.getElementById('logBox').innerHTML = `
-                        <div class="text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 mb-1">
-                            <i class="fa-solid fa-circle-check"></i> Fotograma procesado con éxito
-                        </div>
-                        <div class="text-[11px] text-gray-300">Matriz táctica cargada localmente.</div>
-                    `;
-                }
-                reader.readAsDataURL(file);
-            }
+        const urlParams = new URLSearchParams(window.location.search);
+        const codigoSala = urlParams.get('sala') || 'ConfenacapvSalaGeneralOficial';
+        const claveModerador = urlParams.get('mod');
+        
+        const CLAVE_SECRETA_PROFESOR = "proffe2026*";
+        const esProfesor = (claveModerador === CLAVE_SECRETA_PROFESOR);
+
+        if (esProfesor) {
+            document.getElementById('nombreSalaTexto').innerText = "Sala: " + codigoSala.toUpperCase() + " [MODO INSTRUCTOR]";
+            document.getElementById('rolUsuarioTexto').innerText = "Panel de Control del Instructor:";
+            document.getElementById('rolUsuarioTexto').className = "font-semibold text-green-400 block mb-1";
+        } else {
+            document.getElementById('nombreSalaTexto').innerText = "Sala: " + codigoSala.toUpperCase();
         }
+
+        const roomName = "Confenacapv_" + codigoSala.replace(/[^a-zA-Z0-9_-]/g, '');
+        const jitsiUrl = `https://meet.jit.si/${roomName}`;
+
+        const meetContainer = document.getElementById('meet');
+        meetContainer.innerHTML = `
+            <div class="bg-indigo-900/40 text-indigo-200 p-4 rounded-lg mb-6 max-w-md border border-indigo-500/30">
+                <p class="font-bold mb-2 text-white text-sm">¡Sala de Clases Lista!</p>
+                <p class="text-xs">Haga clic en el botón de abajo para unirse de forma segura a la videoconferencia institucional.</p>
+            </div>
+            
+            <a href="${jitsiUrl}" target="_blank" class="bg-[#2468FF] hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(36,104,255,0.4)] transform transition hover:-translate-y-1 hover:scale-105 mb-4 text-base w-full max-w-xs flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Entrar a la Videollamada
+            </a>
+            
+            <p class="text-xs text-gray-400 max-w-xs mt-2">La sesión abrirá directamente en la plataforma de Jitsi Meet.</p>
+        `;
     </script>
 </body>
 </html>
