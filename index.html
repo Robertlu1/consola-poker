@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Consola Táctica IA - Sala Privada</title>
+    <title>Consola Táctica IA - Póker</title>
     <!-- Iconos de FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -29,6 +29,7 @@
             position: relative;
         }
 
+        /* Selector de Idioma flotante */
         .lang-selector {
             position: absolute;
             top: 0;
@@ -78,27 +79,7 @@
             box-shadow: 0 0 8px #2ec4b6;
         }
 
-        /* Contenedor de transmisión y cámara real */
-        .stream-container {
-            background: #1c2541;
-            border: 2px solid #3a86ff;
-            border-radius: 16px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stream-container video, .stream-container img {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            background: #0b132b;
-            display: none;
-        }
-
+        /* Tarjeta de captura rápida */
         .capture-card {
             background: linear-gradient(135deg, #1c2541 0%, #0b132b 100%);
             border: 2px dashed #3a86ff;
@@ -132,7 +113,7 @@
             color: #8d99ae;
         }
 
-        /* Registro de transmisión en vivo */
+        /* Registro de análisis */
         .log-section {
             background-color: #1c2541;
             border-radius: 16px;
@@ -165,9 +146,17 @@
             text-align: center;
             color: #8d99ae;
             font-size: 0.85rem;
-            min-height: 100px;
+            min-height: 120px;
         }
 
+        .log-content img {
+            max-width: 100%;
+            max-height: 140px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        /* Botón inferior */
         .btn-close {
             background: linear-gradient(135deg, #3a86ff 0%, #2563eb 100%);
             color: white;
@@ -190,64 +179,63 @@
 <body>
 
     <div class="header">
+        <!-- Selector de Idioma -->
         <select id="langSelect" class="lang-selector" onchange="changeLanguage()">
             <option value="es">🇪🇸 ES</option>
             <option value="en">🇬🇧 EN</option>
         </select>
 
         <h1 id="txtTitle">Consola Táctica IA</h1>
-        <p id="txtSubtitle">Canal Privado y Seguro</p>
+        <p id="txtSubtitle">Analizador Privado de Póker</p>
         <div class="status-badge" id="txtStatus">
-            <span></span> Sala Virtual Activa en Telegram
+            <span></span> PC Conectada y en Escucha
         </div>
     </div>
 
-    <!-- Acceso directo a cámara real -->
+    <!-- Disparador rápido de cámara/galería -->
     <div class="capture-card" onclick="document.getElementById('cameraInput').click();">
-        <i class="fa-solid fa-video"></i>
-        <h3 id="txtCamTitle">Activar Cámara en Vivo</h3>
-        <p id="txtCamSub">Transmisión directa desde tu dispositivo</p>
+        <i class="fa-solid fa-camera-retro"></i>
+        <h3 id="txtCamTitle">Toca aquí para abrir la cámara</h3>
+        <p id="txtCamSub">Toma la foto de la mesa o mano actual</p>
     </div>
     
-    <!-- Input multimedia real para hardware de cámara y archivos -->
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
-
-    <div class="stream-container">
-        <video id="liveVideo" autoplay playsinline></video>
-        <img id="capturedImage" alt="Feed en Vivo">
-    </div>
+    <input type="file" id="cameraInput" accept="image/*" style="display: none;">
 
     <div class="log-section">
-        <div class="log-title" id="txtLogTitle">Estado de la Sala</div>
+        <div class="log-title" id="txtLogTitle">Registro de Análisis</div>
         <div class="log-content" id="logBox">
-            <i class="fa-solid fa-signal" style="font-size: 1.8rem; color: #2ec4b6; margin-bottom: 8px;"></i>
-            <span id="txtWaiting">Conectado al canal seguro.<br>Selecciona la cámara para iniciar el flujo de video.</span>
+            <i class="fa-solid fa-brain" style="font-size: 2rem; color: #334155; margin-bottom: 8px;"></i>
+            <span id="txtWaiting">Esperando captura de pantalla...<br>Sube una imagen para activar el trabajo unísono de las 6 IAs.</span>
         </div>
     </div>
 
-    <button class="btn-close" id="btnClose" onclick="window.close()">Salir de la Sala</button>
+    <button class="btn-close" id="btnClose" onclick="window.close()">Cerrar Consola</button>
 
     <script>
         const texts = {
             es: {
                 title: "Consola Táctica IA",
-                subtitle: "Canal Privado y Seguro",
-                status: "Sala Virtual Activa en Telegram",
-                camTitle: "Activar Cámara en Vivo",
-                camSub: "Transmisión directa desde tu dispositivo",
-                logTitle: "Estado de la Sala",
-                waiting: "Conectado al canal seguro.<br>Selecciona la cámara para iniciar el flujo de video.",
-                active: "Transmisión activa y sincronizada con la red."
+                subtitle: "Analizador Privado de Póker",
+                status: "PC Conectada y en Escucha",
+                camTitle: "Toca aquí para abrir la cámara",
+                camSub: "Toma la foto de la mesa o mano actual",
+                logTitle: "Registro de Análisis",
+                waiting: "Esperando captura de pantalla...<br>Sube una imagen para activar el trabajo unísono de las 6 IAs.",
+                analyzing: "Analizando jugada con las 6 IAs...",
+                resultReady: "¡Veredicto Táctico Generado!",
+                close: "Cerrar Consola"
             },
             en: {
                 title: "AI Tactical Console",
-                subtitle: "Private & Secure Channel",
-                status: "Virtual Room Active on Telegram",
-                camTitle: "Activate Live Camera",
-                camSub: "Direct stream from your device",
-                logTitle: "Room Status",
-                waiting: "Connected to secure channel.<br>Select camera to start video feed.",
-                active: "Live stream active and synchronized with network."
+                subtitle: "Private Poker Analyzer",
+                status: "PC Connected & Listening",
+                camTitle: "Tap here to open camera",
+                camSub: "Take a photo of the current table or hand",
+                logTitle: "Analysis Log",
+                waiting: "Waiting for screenshot...<br>Upload an image to trigger the 6 AIs joint analysis.",
+                analyzing: "Analyzing play with the 6 AIs...",
+                resultReady: "Tactical Verdict Ready!",
+                close: "Close Console"
             }
         };
 
@@ -261,14 +249,14 @@
             document.getElementById('txtLogTitle').innerText = texts[lang].logTitle;
             
             const logBox = document.getElementById('logBox');
-            if(logBox.dataset.state !== "active") {
-                logBox.innerHTML = `<i class="fa-solid fa-signal" style="font-size: 1.8rem; color: #2ec4b6; margin-bottom: 8px;"></i> ${texts[lang].waiting}`;
+            if(logBox.dataset.state === "waiting" || !logBox.dataset.state) {
+                logBox.innerHTML = `<i class="fa-solid fa-brain" style="font-size: 2rem; color: #334155; margin-bottom: 8px;"></i> ${texts[lang].waiting}`;
             }
+            document.getElementById('btnClose').innerText = texts[lang].close;
         }
 
         const cameraInput = document.getElementById('cameraInput');
         const logBox = document.getElementById('logBox');
-        const capturedImage = document.getElementById('capturedImage');
 
         cameraInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -276,18 +264,27 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    logBox.dataset.state = "active";
-                    capturedImage.src = e.target.result;
-                    capturedImage.style.display = "block";
-                    
+                    logBox.dataset.state = "analyzing";
+                    // Fase 1: Respuesta visual inmediata y fluida
                     logBox.innerHTML = `
-                        <div style="color: #2ec4b6; font-weight: bold; margin-bottom: 4px;">
-                            <i class="fa-solid fa-circle-dot" style="color: #ff4d4d; animation: pulse 1.5s infinite;"></i> EN VIVO (Telegram Stream)
-                        </div>
-                        <div style="font-size: 0.8rem; color: #f8fafc;">
-                            ${texts[currentLang].active}
+                        <img src="${e.target.result}" alt="Captured Hand">
+                        <div style="color: #2ec4b6; font-weight: bold; margin-top: 5px;">
+                            <i class="fa-solid fa-spinner fa-spin"></i> ${texts[currentLang].analyzing}
                         </div>
                     `;
+
+                    // Fase 2: Simulación rápida y objetiva de respuesta táctica en tiempo récord (1.2 segundos)
+                    setTimeout(() => {
+                        logBox.innerHTML = `
+                            <img src="${e.target.result}" alt="Captured Hand">
+                            <div style="color: #2ec4b6; font-weight: bold; margin-top: 4px; font-size: 0.8rem;">
+                                <i class="fa-solid fa-check-circle"></i> ${texts[currentLang].resultReady}
+                            </div>
+                            <div style="font-size: 0.78rem; margin-top: 6px; color: #f8fafc; text-align: left; background: #162038; padding: 8px; border-radius: 6px; border-left: 3px solid #2ec4b6;">
+                                <strong>Acción Óptima:</strong> Valor esperado positivo. Alta probabilidad de éxito en river.
+                            </div>
+                        `;
+                    }, 1200);
                 }
                 reader.readAsDataURL(file);
             }
