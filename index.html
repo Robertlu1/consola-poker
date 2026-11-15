@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Consola Táctica IA - Póker</title>
+    <!-- Iconos de FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0b132b; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+        body { background-color: #0b132b; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow-x: hidden; }
         .glass-panel { background: rgba(28, 37, 65, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(58, 134, 255, 0.3); }
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-4 relative">
 
-    <div class="max-w-md mx-auto w-full flex-grow flex flex-col">
+    <div class="max-w-md mx-auto w-full flex-grow flex flex-col fade-in">
         <!-- Cabecera -->
         <div class="text-center mb-4 relative">
             <select id="langSelect" class="absolute top-0 right-0 bg-[#1c2541] border border-blue-500 text-white px-2 py-1 rounded-lg text-xs outline-none cursor-pointer" onchange="changeLanguage()">
@@ -24,57 +27,102 @@
             <h1 id="txtTitle" class="text-xl font-bold tracking-wider mb-1">Consola Táctica IA</h1>
             <p id="txtSubtitle" class="text-xs text-gray-400">Analizador Privado de Póker</p>
             
-            <div class="inline-flex items-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold mt-2">
+            <div class="inline-flex items-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold mt-2" id="txtStatus">
                 <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block mr-2 shadow-[0_0_8px_#2ec4b6]"></span> Canal Seguro Activo
             </div>
         </div>
 
-        <!-- Botón de Disparo Directo a Cámara -->
-        <label for="nativeCamera" class="glass-panel rounded-2xl p-6 text-center cursor-pointer mb-4 transition-all active:scale-95 border-dashed border-2 border-blue-500 block shadow-lg">
+        <!-- Botón de Disparo Directo a Cámara (Forzado por Hardware Nativo) -->
+        <label for="nativeCamera" class="glass-panel rounded-2xl p-6 text-center cursor-pointer mb-4 transition-all duration-300 active:scale-95 border-dashed border-2 border-blue-500 block shadow-lg">
             <i class="fa-solid fa-camera text-4xl text-blue-400 mb-2"></i>
-            <h3 id="txtCamTitle" class="text-sm font-bold text-white mb-1">Encender Cámara Trasera</h3>
+            <h3 id="txtCamTitle" class="text-sm font-bold text-white mb-1">Activar Cámara Directa</h3>
             <p id="txtCamSub" class="text-xs text-gray-400">Capturar jugada al instante</p>
         </label>
         
-        <!-- Input nativo forzado a hardware -->
-        <input type="file" id="nativeCamera" accept="image/*" capture="environment" style="display: none;" onchange="handleImage(event)">
+        <!-- Input nativo con atributos estrictos de cámara -->
+        <input type="file" id="nativeCamera" accept="image/*" capture="camera" style="display: none;" onchange="handleImage(event)">
 
         <!-- Visor de la Captura -->
         <div class="glass-panel rounded-2xl p-3 mb-4 relative overflow-hidden flex flex-col items-center justify-center min-h-[160px]">
             <img id="snapshotPreview" alt="Captura de Mesa" class="w-full h-44 object-cover rounded-xl hidden">
             <div id="placeholderView" class="text-center text-gray-400 text-xs py-6">
                 <i class="fa-solid fa-image text-2xl text-slate-600 mb-2"></i>
-                <p id="txtWaiting">Ninguna imagen capturada aún.<br>Usa el botón superior para activar la cámara.</p>
+                <p id="txtWaiting">Ninguna imagen capturada aún.<br>Usa el botón superior para abrir la cámara.</p>
             </div>
         </div>
 
         <!-- Registro de Análisis -->
         <div class="glass-panel rounded-2xl p-4 flex-grow flex flex-col mb-4">
-            <div class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-2">Registro de Análisis</div>
+            <div id="txtLogTitle" class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-2">Registro de Análisis</div>
             <div id="logBox" class="bg-[#0b132b] rounded-xl p-3 flex-grow flex flex-col items-center justify-center text-center text-gray-400 text-xs">
-                <span>Esperando transmisión de datos...</span>
+                <span id="txtLogSub">Esperando transmisión de datos...</span>
             </div>
         </div>
 
-        <button class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg w-full text-sm" onclick="window.close()">
+        <button id="btnClose" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg w-full text-sm transition active:opacity-90" onclick="window.close()">
             Cerrar Consola
         </button>
     </div>
 
     <script>
+        const texts = {
+            es: {
+                title: "Consola Táctica IA",
+                subtitle: "Analizador Privado de Póker",
+                status: "Canal Seguro Activo",
+                camTitle: "Activar Cámara Directa",
+                camSub: "Capturar jugada al instante",
+                logTitle: "Registro de Análisis",
+                waiting: "Ninguna imagen capturada aún.<br>Usa el botón superior para abrir la cámara.",
+                analyzing: "Procesando fotograma táctico...",
+                success: "Fotograma recibido correctamente. Matriz lista."
+            },
+            en: {
+                title: "AI Tactical Console",
+                subtitle: "Private Poker Analyzer",
+                status: "Secure Channel Active",
+                camTitle: "Activate Direct Camera",
+                camSub: "Capture play instantly",
+                logTitle: "Analysis Log",
+                waiting: "No image captured yet.<br>Use the button above to open camera.",
+                analyzing: "Processing tactical frame...",
+                success: "Frame received successfully. Matrix ready."
+            }
+        };
+
+        function changeLanguage() {
+            const lang = document.getElementById('langSelect').value;
+            document.getElementById('txtTitle').innerText = texts[lang].title;
+            document.getElementById('txtSubtitle').innerText = texts[lang].subtitle;
+            document.getElementById('txtStatus').innerHTML = `<span class="w-2 h-2 bg-emerald-400 rounded-full inline-block mr-2 shadow-[0_0_8px_#2ec4b6]"></span> ${texts[lang].status}`;
+            document.getElementById('txtCamTitle').innerText = texts[lang].camTitle;
+            document.getElementById('txtCamSub').innerText = texts[lang].camSub;
+            document.getElementById('txtLogTitle').innerText = texts[lang].logTitle;
+            document.getElementById('txtWaiting').innerHTML = texts[lang].waiting;
+            document.getElementById('btnClose').innerText = (lang === 'es') ? "Cerrar Consola" : "Close Console";
+        }
+
         function handleImage(event) {
             const file = event.target.files[0];
+            const currentLang = document.getElementById('langSelect').value;
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('snapshotPreview').src = e.target.result;
-                    document.getElementById('snapshotPreview').style.display = "block";
-                    document.getElementById('placeholderView').style.display = "none";
-                    document.getElementById('logBox').innerHTML = `
+                    const preview = document.getElementById('snapshotPreview');
+                    const placeholder = document.getElementById('placeholderView');
+                    const logBox = document.getElementById('logBox');
+
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                    placeholder.style.display = "none";
+
+                    logBox.innerHTML = `
                         <div class="text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 mb-1">
-                            <i class="fa-solid fa-circle-check"></i> Fotograma procesado con éxito
+                            <i class="fa-solid fa-circle-check"></i> ${texts[currentLang].analyzing}
                         </div>
-                        <div class="text-[11px] text-gray-300">Matriz táctica cargada localmente.</div>
+                        <div class="text-[11px] text-gray-300">
+                            ${texts[currentLang].success}
+                        </div>
                     `;
                 }
                 reader.readAsDataURL(file);
