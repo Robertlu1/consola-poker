@@ -32,29 +32,29 @@
         <div class="glass-panel rounded-2xl p-4 text-center mb-4 border-dashed border-2 border-blue-500 shadow-lg">
             <div id="cameraControls" class="flex flex-col gap-2">
                 <button onclick="startLiveCamera()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition active:scale-95 shadow-md">
-                    <i class="fa-solid fa-video text-base"></i> Encender Cámara en Vivo
+                    <i class="fa-solid fa-camera text-base"></i> Activar Lente de Cámara
                 </button>
-                <p class="text-[11px] text-gray-400">Abre el streaming en tiempo real directo desde Google Chrome</p>
+                <p class="text-[11px] text-gray-400">Enciende el visor para enfocar la mesa</p>
             </div>
 
-            <!-- Botón de captura que aparece al encender el video -->
+            <!-- Botón de captura instantánea de foto -->
             <button id="captureBtn" onclick="captureLiveFrame()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition active:scale-95 shadow-md w-full hidden mt-2">
-                <i class="fa-solid fa-camera text-base"></i> Capturar Mesa y Analizar
+                <i class="fa-solid fa-circle-dot text-base"></i> Tomar Foto y Analizar
             </button>
         </div>
 
-        <!-- Visor de Video en Vivo / Captura -->
+        <!-- Visor del Lente / Foto Capturada -->
         <div class="glass-panel rounded-2xl p-2 mb-4 relative overflow-hidden flex flex-col items-center justify-center min-h-[180px]">
-            <!-- Elemento de video en vivo -->
+            <!-- Elemento de video en tiempo real -->
             <video id="liveVideo" autoplay playsinline muted class="w-full h-48 object-cover rounded-xl hidden"></video>
-            <!-- Canvas oculto para extraer el fotograma -->
+            <!-- Canvas para extraer la foto estática -->
             <canvas id="snapshotCanvas" class="hidden"></canvas>
-            <!-- Imagen estática de la captura realizada -->
+            <!-- Imagen de la jugada ya capturada -->
             <img id="snapshotPreview" alt="Jugada en Mesa" class="w-full h-48 object-cover rounded-xl hidden">
             
             <div id="placeholderView" class="text-center text-gray-400 text-xs py-6">
-                <i class="fa-solid fa-video-slash text-2xl text-slate-500 mb-2"></i>
-                <p>Cámara inactiva.<br>Abre en Google Chrome y presiona "Encender Cámara en Vivo".</p>
+                <i class="fa-solid fa-eye-slash text-2xl text-slate-500 mb-2"></i>
+                <p>Cámara en espera.<br>Presiona "Activar Lente de Cámara" para comenzar.</p>
             </div>
         </div>
 
@@ -65,7 +65,7 @@
                 <button onclick="resetConsole()" class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded hover:bg-red-500/30 transition">Limpiar / Reiniciar</button>
             </div>
             <div id="logBox" class="bg-[#0b132b] rounded-xl p-3 flex-grow flex flex-col justify-center text-gray-300 text-xs">
-                <span class="text-center text-gray-500">Esperando transmisión de video y captura de mesa...</span>
+                <span class="text-center text-gray-500">Esperando captura fotográfica de la mesa...</span>
             </div>
         </div>
 
@@ -77,7 +77,6 @@
     <script>
         let videoStream = null;
 
-        // Activar streaming de video en vivo nativo (Funciona perfecto en Google Chrome / Safari)
         async function startLiveCamera() {
             const liveVideo = document.getElementById('liveVideo');
             const placeholder = document.getElementById('placeholderView');
@@ -103,16 +102,16 @@
 
                 document.getElementById('logBox').innerHTML = `
                     <div class="text-emerald-400 font-bold text-xs flex items-center gap-2">
-                        <i class="fa-solid fa-circle-dot animate-pulse"></i> Lente trasero activo en tiempo real. Enfoca la mesa.
+                        <i class="fa-solid fa-circle-dot animate-pulse"></i> Lente activo. Enfoca la mesa y toma la foto.
                     </div>
                 `;
             } catch (err) {
-                console.error("Error al acceder a la cámara:", err);
-                alert("Asegúrate de abrir esta página directamente en Google Chrome y permitir el acceso a la cámara.");
+                console.error("Error al abrir la cámara:", err);
+                alert("Por favor asegúrate de dar el permiso de cámara cuando el navegador lo solicite.");
             }
         }
 
-        // Capturar fotograma exacto del video en vivo
+        // Tomar la foto instantánea desde el visor
         function captureLiveFrame() {
             const liveVideo = document.getElementById('liveVideo');
             const canvas = document.getElementById('snapshotCanvas');
@@ -128,7 +127,7 @@
 
             const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
 
-            // Detenemos el streaming de la cámara para congelar la jugada analizada
+            // Apagamos el streaming de la cámara para congelar la foto exacta
             stopCameraStream();
 
             snapshotPreview.src = imageDataUrl;
@@ -152,7 +151,7 @@
 
             logBox.innerHTML = `
                 <div class="text-amber-400 font-bold text-xs flex items-center gap-2 mb-2">
-                    <i class="fa-solid fa-spinner fa-spin"></i> Los 6 bots escanean el fotograma en vivo...
+                    <i class="fa-solid fa-spinner fa-spin"></i> Los 6 bots escanean la foto de la mesa...
                 </div>
                 <div class="text-[11px] text-gray-400">Procesando Equity, GTO y umbrales de peligro...</div>
             `;
@@ -181,7 +180,7 @@
                     `;
                 } else {
                     logBox.innerHTML = `
-                        <div class="text-emerald-400 font-bold text-xs flex items-center gap-1 mb-1">
+                        <div class="alert-emerald-400 font-bold text-xs flex items-center gap-1 mb-1">
                             <i class="fa-solid fa-shield-halved"></i> ¡Análisis Objetivo Completado!
                         </div>
                         <div class="text-white font-semibold mb-1">Probabilidad de Éxito: <span class="text-emerald-400 text-sm">${exactWin}%</span></div>
