@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Consola Táctica Personal - Roberto</title>
+    <title>Poker Arrow - Asistente Privado</title>
+    
+    <meta property="og:title" content="Poker Arrow - 6 Bots en Vivo">
+    <meta property="og:description" content="Asistente Privado de Póker. Análisis de Equity, GTO y Riesgo al instante.">
+    <meta property="og:image" content="434574.jpg">
+    <meta property="og:type" content="website">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -13,31 +19,63 @@
         @keyframes pulseGlow { 0% { box-shadow: 0 0 5px #2ec4b6; } 50% { box-shadow: 0 0 20px #2ec4b6; } 100% { box-shadow: 0 0 5px #2ec4b6; } }
         .alert-pulse { animation: alertPulse 1s infinite; }
         @keyframes alertPulse { 0% { background-color: rgba(239, 68, 68, 0.2); } 50% { background-color: rgba(239, 68, 68, 0.5); } 100% { background-color: rgba(239, 68, 68, 0.2); } }
-        
         .shutter-flash { animation: shutterFlash 0.25s ease-out; }
         @keyframes shutterFlash { from { opacity: 0.15; } to { opacity: 1; } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-4 relative">
+<body class="min-h-screen flex flex-col relative overflow-hidden">
 
-    <div class="max-w-md mx-auto w-full flex-grow flex flex-col">
-        <!-- Cabecera Personal -->
+    <!-- 1. PANTALLA DE LOGIN (EL CANDADO INTELIGENTE) -->
+    <div id="loginScreen" class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[#0b132b] transition-opacity duration-500">
+        <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('434574.jpg'); filter: blur(5px);"></div>
+        
+        <div class="relative z-10 glass-panel p-8 rounded-2xl max-w-sm w-[90%] text-center shadow-[0_0_30px_rgba(37,99,235,0.2)] border border-blue-500/30">
+            <i class="fa-solid fa-shield-halved text-4xl text-blue-400 mb-4"></i>
+            <h2 class="text-xl font-bold tracking-wider mb-1 text-white">ACCESO RESTRINGIDO</h2>
+            <p id="loginMessage" class="text-xs text-gray-400 mb-6">Ingrese su código de licencia oficial para activar Poker Arrow.</p>
+            
+            <input type="text" id="accessCodeInput" placeholder="PKR-..." class="w-full bg-[#0b132b] border border-blue-500/50 rounded-xl px-4 py-3 text-center text-white font-bold tracking-widest uppercase mb-2 outline-none focus:border-blue-400 focus:shadow-[0_0_10px_rgba(59,130,246,0.5)] transition">
+            
+            <p id="loginError" class="text-[10px] text-red-400 font-bold mb-4 hidden"><i class="fa-solid fa-circle-xmark"></i> Código inválido o sello de seguridad roto.</p>
+            
+            <button onclick="verificarAcceso()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl text-sm transition active:scale-95 shadow-md">
+                Desbloquear Sistema
+            </button>
+            <p class="mt-4 text-[9px] text-gray-500">El código se vinculará a este dispositivo.<br>Para adquirir una licencia, contacte al desarrollador.</p>
+        </div>
+    </div>
+
+    <!-- 2. PANTALLA DE PORTADA (SPLASH SCREEN) -->
+    <div id="splashScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b132b] transition-opacity duration-500 hidden opacity-0">
+        <div class="absolute inset-0 bg-cover bg-center opacity-40" style="background-image: url('434574.jpg');"></div>
+        
+        <div class="relative z-10 flex flex-col items-center p-6 text-center w-full max-w-sm mt-10">
+            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 tracking-wider mb-1" style="text-shadow: 0 0 15px rgba(46,196,182,0.4);">POKER</h1>
+            <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 tracking-wider mb-2" style="text-shadow: 0 0 15px rgba(245,158,11,0.4);">ARROW</h1>
+            <p class="text-[11px] text-gray-300 mb-12 font-bold uppercase tracking-[0.2em] bg-black/50 px-3 py-1 rounded-full border border-gray-500/30">6 Bots Analistas en Vivo</p>
+            
+            <button onclick="entrarConsola()" class="w-full bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white font-bold py-4 px-6 rounded-xl text-sm transition active:scale-95 shadow-[0_0_20px_rgba(37,99,235,0.6)] border border-blue-400/50 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-power-off"></i> Iniciar Sistema Analítico
+            </button>
+            <p id="licenseStatusText" class="mt-4 text-[10px] text-emerald-400 font-semibold tracking-wider"><i class="fa-solid fa-check"></i> LICENCIA VERIFICADA</p>
+        </div>
+    </div>
+
+    <!-- 3. CONTENIDO PRINCIPAL DE LA APP -->
+    <div id="mainApp" class="max-w-md mx-auto w-full flex-grow flex flex-col p-4 opacity-0 transition-opacity duration-500 hidden h-full overflow-y-auto">
         <div class="text-center mb-3">
-            <h1 class="text-lg font-bold tracking-wider mb-0.5">Consola Táctica Personal</h1>
-            <p class="text-[11px] text-gray-400">Asistente Privado de Póker — Roberto</p>
-
+            <h1 class="text-lg font-bold tracking-wider mb-0.5">Poker Arrow</h1>
+            <p class="text-[11px] text-gray-400">Asistente Táctico Privado</p>
             <div class="inline-flex items-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-0.5 rounded-full text-xs font-semibold mt-1 pulse-glow">
                 <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block mr-1.5 shadow-[0_0_8px_#2ec4b6]"></span> 6 Bots Analistas Activos
             </div>
         </div>
 
-        <!-- Disparador y Controles -->
         <div class="glass-panel rounded-2xl p-3 mb-3 shadow-lg">
             <button type="button" id="shutterBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition active:scale-95 shadow-md border border-blue-400/30">
                 <i class="fa-solid fa-camera text-base"></i> <span id="shutterLabel">Activar Cámara</span>
             </button>
             
-            <!-- Botón para alternar Horizontal/Vertical -->
             <div class="flex justify-center mt-3">
                 <button type="button" id="toggleViewBtn" class="text-[10px] text-blue-300 hover:text-white bg-blue-900/30 hover:bg-blue-800/50 border border-blue-500/30 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-minimize"></i> <span id="toggleViewText">Cambiar a Modo Horizontal</span>
@@ -48,17 +86,15 @@
             <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
         </div>
 
-        <!-- Visor dinámico -->
         <div id="viewer" class="glass-panel rounded-2xl p-2 mb-3 relative overflow-hidden flex flex-col items-center justify-center min-h-[140px] transition-all duration-300">
             <video id="liveVideo" autoplay playsinline muted class="hidden w-full bg-black rounded-xl transition-all duration-300"></video>
             <img id="snapshotPreview" alt="Jugada en Mesa" class="hidden w-full rounded-xl transition-all duration-300">
             <div id="placeholderView" class="text-center text-gray-400 text-xs py-4">
                 <i class="fa-solid fa-eye text-xl text-slate-500 mb-1 block"></i>
-                <p>Consola lista para velocidad máxima.<br>Toca el botón superior para capturar.</p>
+                <p>Poker Arrow listo para escanear.<br>Toca el botón superior para capturar.</p>
             </div>
         </div>
 
-        <!-- Matriz de Resultados y Análisis de Victoria -->
         <div class="glass-panel rounded-2xl p-4 flex-grow flex flex-col mb-3 min-h-[220px]">
             <div class="flex justify-between items-center mb-2">
                 <span class="text-xs uppercase tracking-widest text-gray-400 font-bold">Veredicto del Equipo de Bots</span>
@@ -69,19 +105,159 @@
             </div>
         </div>
 
-        <button class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg w-full text-xs" onclick="window.close()">
-            Cerrar Consola
+        <button onclick="cerrarSesion()" class="bg-red-900/40 text-red-400 border border-red-500/30 font-bold py-2.5 px-4 rounded-xl w-full text-[10px] mb-2 hover:bg-red-800/50 transition">
+            <i class="fa-solid fa-right-from-bracket"></i> Desvincular Dispositivo (Cerrar Sesión)
         </button>
     </div>
 
     <script>
-        // ---------- Configuración ----------
+        // ==========================================
+        // 🔐 MOTOR CRIPTOGRÁFICO Y LECTURA DE LICENCIAS
+        // Esta CLAVE_MAESTRA debe ser EXACTAMENTE IGUAL a la de tu Fábrica de Llaves.
+        // ==========================================
+        const CLAVE_MAESTRA = "TIBURON_ROBERTO_2026_SECRETO";
+
+        // Función matemática para generar el sello idéntico al generador
+        function crearSello(texto) {
+            let hash = 0;
+            for (let i = 0; i < texto.length; i++) {
+                hash = ((hash << 5) - hash) + texto.charCodeAt(i);
+                hash |= 0;
+            }
+            let sello = Math.abs(hash).toString(36).substring(0, 4).toUpperCase();
+            while(sello.length < 4) sello += '0';
+            return sello;
+        }
+
+        // --- SISTEMA DE ARRANQUE Y MEMORIA DE DISPOSITIVO ---
+        document.addEventListener("DOMContentLoaded", () => {
+            verificarMemoriaLocal();
+        });
+
+        function verificarMemoriaLocal() {
+            const status = localStorage.getItem('pokerArrow_status');
+            const expiry = localStorage.getItem('pokerArrow_expiry');
+
+            if (status === 'permanente') {
+                abrirPantallaSplash("<i class='fa-solid fa-gem text-blue-400'></i> LICENCIA VITALICIA VIP ACTIVA");
+            } else if (status === 'temporal' && expiry) {
+                const now = new Date().getTime();
+                if (now < expiry) {
+                    const diasRestantes = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                    abrirPantallaSplash(`<i class='fa-regular fa-clock text-amber-400'></i> LICENCIA ACTIVA: ${diasRestantes} DÍAS RESTANTES`);
+                } else {
+                    cerrarSesion("Su licencia de alquiler ha expirado. Adquiera un nuevo código.");
+                }
+            } else {
+                document.getElementById('loginScreen').style.display = 'flex';
+            }
+        }
+
+        // --- VALIDACIÓN DEL CÓDIGO INGRESADO POR EL CLIENTE ---
+        function verificarAcceso() {
+            const inputCode = document.getElementById('accessCodeInput').value.trim().toUpperCase();
+            const errorMsg = document.getElementById('loginError');
+            const loginScreen = document.getElementById('loginScreen');
+
+            // 1. Dividir el código. Ejemplo: PKR - 30D - X9F2A1 - H4K9
+            const partes = inputCode.split('-');
+            
+            // Verificación básica de estructura
+            if (partes.length === 4 && partes[0] === 'PKR') {
+                const prefijo = partes[1]; // VIP, 10D, 30D, 365D
+                const aleatorio = partes[2];
+                const firmaIngresada = partes[3];
+                
+                // Reconstruir la base y calcular la firma localmente
+                const baseCodigo = `PKR-${prefijo}-${aleatorio}`;
+                const firmaCalculada = crearSello(baseCodigo + CLAVE_MAESTRA);
+
+                // 2. Comparar si el sello matemático coincide
+                if (firmaCalculada === firmaIngresada) {
+                    // ¡CÓDIGO LEGÍTIMO Y NO ALTERADO!
+                    errorMsg.classList.add('hidden');
+                    
+                    if (prefijo === 'VIP') {
+                        localStorage.setItem('pokerArrow_status', 'permanente');
+                        abrirPantallaSplash("<i class='fa-solid fa-gem text-blue-400'></i> LICENCIA VITALICIA VIP ACTIVA");
+                    } else {
+                        // Extraer los días (ej: "30D" -> 30)
+                        const dias = parseInt(prefijo.replace('D', ''));
+                        const milisegundos = dias * 24 * 60 * 60 * 1000;
+                        const fechaVencimiento = new Date().getTime() + milisegundos;
+                        
+                        localStorage.setItem('pokerArrow_status', 'temporal');
+                        localStorage.setItem('pokerArrow_expiry', fechaVencimiento);
+                        abrirPantallaSplash(`<i class='fa-regular fa-clock text-amber-400'></i> LICENCIA ACTIVADA POR ${dias} DÍAS`);
+                    }
+                    return; // Termina la función con éxito
+                }
+            }
+
+            // Si llega aquí, el código es falso, inventado o el sello no coincide
+            errorMsg.classList.remove('hidden');
+            const panel = loginScreen.querySelector('.glass-panel');
+            panel.style.transform = 'translateX(-10px)';
+            setTimeout(() => panel.style.transform = 'translateX(10px)', 100);
+            setTimeout(() => panel.style.transform = 'translateX(-10px)', 200);
+            setTimeout(() => panel.style.transform = 'translateX(0)', 300);
+        }
+
+        function abrirPantallaSplash(mensajeStatus) {
+            document.getElementById('licenseStatusText').innerHTML = mensajeStatus;
+            document.getElementById('loginScreen').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('loginScreen').style.display = 'none';
+                const splash = document.getElementById('splashScreen');
+                splash.classList.remove('hidden');
+                setTimeout(() => splash.style.opacity = '1', 50);
+            }, 500);
+        }
+
+        function cerrarSesion(mensajeAdicional = null) {
+            localStorage.removeItem('pokerArrow_status');
+            localStorage.removeItem('pokerArrow_expiry');
+            
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('splashScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            setTimeout(() => document.getElementById('loginScreen').style.opacity = '1', 50);
+            document.getElementById('accessCodeInput').value = '';
+            
+            if (mensajeAdicional) {
+                const msgEl = document.getElementById('loginMessage');
+                msgEl.innerHTML = `<span class="text-red-400 font-bold">${mensajeAdicional}</span><br>Ingrese un nuevo código.`;
+            }
+            stopCamera();
+        }
+
+        document.getElementById('accessCodeInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') verificarAcceso();
+        });
+
+        // ---------- Transición a Consola Principal ----------
+        function entrarConsola() {
+            const splash = document.getElementById('splashScreen');
+            const app = document.getElementById('mainApp');
+            
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                app.classList.remove('hidden');
+                setTimeout(() => {
+                    app.style.opacity = '1';
+                    startCamera();
+                }, 50);
+            }, 500);
+        }
+
+        // ==========================================
+        // CÁMARA Y ANÁLISIS 
+        // ==========================================
         const MAX_SIDE = 1600;        
         const JPEG_QUALITY = 0.85;    
-        const CONSTRAINTS = {
-            audio: false,
-            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1600 }, height: { ideal: 1200 } }
-        };
+        const CONSTRAINTS = { audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1600 }, height: { ideal: 1200 } } };
 
         const $ = (id) => document.getElementById(id);
         const viewer = $('viewer'), video = $('liveVideo'), snapshot = $('snapshotPreview');
@@ -90,14 +266,9 @@
         const canvas = document.createElement('canvas');
         const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-        let stream = null;       
-        let live = false;        
-        let starting = null;     
-        let failCount = 0;
-        let analysisTimer = null;
+        let stream = null; live = false; starting = null; failCount = 0; analysisTimer = null;
         let useFallback = !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 
-        // ---------- Lógica del Botón Horizontal/Vertical ----------
         let isCompactView = false;
         $('toggleViewBtn').addEventListener('click', () => {
             isCompactView = !isCompactView;
@@ -117,18 +288,12 @@
             }
         });
 
-        // ---------- Interfaz ----------
         function refreshUI() {
             const hasSnapshot = !snapshot.classList.contains('hidden');
             viewer.classList.toggle('live', !!stream);
-            
-            // Ocultar el video en vivo si no hay stream o si la FOTO ya está tomada
             video.classList.toggle('hidden', !stream || hasSnapshot);
             placeholder.classList.toggle('hidden', !!stream || hasSnapshot);
-            
-            shutterLabel.textContent = live ? 'Capturar Jugada al Instante'
-                : useFallback ? 'Tomar Foto de la Mesa'
-                : starting ? 'Abriendo cámara…' : 'Activar Cámara';
+            shutterLabel.textContent = live ? 'Capturar Jugada al Instante' : useFallback ? 'Tomar Foto de la Mesa' : starting ? 'Abriendo cámara…' : 'Activar Cámara';
         }
 
         function setStatus(msg) {
@@ -142,14 +307,10 @@
             refreshUI();
         }
 
-        // ---------- Cámara en vivo ----------
         async function openStream() {
-            try {
-                return await navigator.mediaDevices.getUserMedia(CONSTRAINTS);
-            } catch (err) {
+            try { return await navigator.mediaDevices.getUserMedia(CONSTRAINTS); } catch (err) {
                 if (err.name !== 'NotReadableError' && err.name !== 'AbortError') throw err;
-                await sleep(400);   
-                return navigator.mediaDevices.getUserMedia(CONSTRAINTS);
+                await sleep(400); return navigator.mediaDevices.getUserMedia(CONSTRAINTS);
             }
         }
 
@@ -159,66 +320,37 @@
                 try {
                     const s = await openStream();
                     if (document.hidden) { s.getTracks().forEach((t) => t.stop()); return; }
-                    stream = s;
-                    video.srcObject = s;
-                    refreshUI();
-                    video.play().catch(() => {});
-
+                    stream = s; video.srcObject = s; refreshUI(); video.play().catch(() => {});
                     const t0 = performance.now();
                     while (!(video.readyState >= 2 && video.videoWidth > 0)) {
                         if (stream !== s) return;   
                         if (performance.now() - t0 > 4000) throw new DOMException('Sin imagen', 'TimeoutError');
                         await sleep(50);
                     }
-
                     const track = s.getVideoTracks()[0];
                     track.addEventListener('ended', () => { if (stream === s) stopCamera(); });
                     const caps = track.getCapabilities ? track.getCapabilities() : {};
-                    if (caps.focusMode && caps.focusMode.includes('continuous')) {
-                        track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
-                    }
-                    live = true;
-                    failCount = 0;
-                    setStatus('');
-                } catch (err) {
-                    stopCamera();
-                    onCameraError(err);
-                } finally {
-                    starting = null;
-                    refreshUI();
-                }
+                    if (caps.focusMode && caps.focusMode.includes('continuous')) track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
+                    live = true; failCount = 0; setStatus('');
+                } catch (err) { stopCamera(); onCameraError(err); } finally { starting = null; refreshUI(); }
             })();
             refreshUI();
         }
 
         function stopCamera() {
             if (stream) stream.getTracks().forEach((t) => t.stop());
-            stream = null;
-            live = false;
-            video.srcObject = null;
-            refreshUI();
+            stream = null; live = false; video.srcObject = null; refreshUI();
         }
 
         function onCameraError(err) {
-            const reasons = {
-                NotAllowedError: 'Permiso de cámara denegado.',
-                SecurityError: 'El navegador bloqueó el acceso a la cámara.',
-                NotFoundError: 'No se encontró ninguna cámara.',
-                NotReadableError: 'La cámara está ocupada por otra app.',
-                TimeoutError: 'La cámara no entregó imagen.'
-            };
-            const permanent = ['NotAllowedError', 'SecurityError', 'NotFoundError'].includes(err.name);
             failCount++;
-            if (permanent || failCount >= 2) useFallback = true;
-            setStatus((reasons[err.name] || 'No se pudo abrir la cámara.') +
-                (useFallback ? ' Usando cámara del sistema.' : ' Toca para reintentar.'));
+            if (['NotAllowedError', 'SecurityError', 'NotFoundError'].includes(err.name) || failCount >= 2) useFallback = true;
+            setStatus("Error de cámara. " + (useFallback ? 'Usando cámara del sistema.' : 'Toca para reintentar.'));
         }
 
-        // ---------- Captura ----------
         function toJpegDataUrl(source, w, h) {
             const scale = Math.min(1, MAX_SIDE / Math.max(w, h));
-            canvas.width = Math.round(w * scale);
-            canvas.height = Math.round(h * scale);
+            canvas.width = Math.round(w * scale); canvas.height = Math.round(h * scale);
             canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
             return canvas.toDataURL('image/jpeg', JPEG_QUALITY);
         }
@@ -226,115 +358,45 @@
         shutterBtn.addEventListener('click', () => {
             if (useFallback) { fileInput.click(); return; }   
             if (!live) { startCamera(); return; }
-            
-            // Si la foto ya está en pantalla, no hacer nada hasta que le den a "Limpiar"
             if (!snapshot.classList.contains('hidden')) return;
-
-            if (video.readyState < 2 || !video.videoWidth) {  
-                stopCamera();
-                startCamera();
-                return;
-            }
+            if (video.readyState < 2 || !video.videoWidth) { stopCamera(); startCamera(); return; }
             const dataUrl = toJpegDataUrl(video, video.videoWidth, video.videoHeight);
-            
-            // Ocultamos el video al instante de disparar y mostramos la foto grande
-            video.classList.add('hidden');
-            showSnapshot(dataUrl);
-            analyzeSnapshot(dataUrl);
+            video.classList.add('hidden'); showSnapshot(dataUrl); analyzeSnapshot(dataUrl);
         });
 
-        // Respaldo con el input nativo
         fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            fileInput.value = '';   
-            if (!file) return;
-            const url = URL.createObjectURL(file);
-            const img = new Image();
-            img.onload = () => {
-                const dataUrl = toJpegDataUrl(img, img.naturalWidth, img.naturalHeight);
-                URL.revokeObjectURL(url);
-                showSnapshot(dataUrl);
-                analyzeSnapshot(dataUrl);
-            };
-            img.onerror = () => {
-                URL.revokeObjectURL(url);
-                setStatus('No se pudo leer la foto. Inténtalo de nuevo.');
-            };
+            const file = fileInput.files[0]; fileInput.value = ''; if (!file) return;
+            const url = URL.createObjectURL(file); const img = new Image();
+            img.onload = () => { const dataUrl = toJpegDataUrl(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(url); showSnapshot(dataUrl); analyzeSnapshot(dataUrl); };
             img.src = url;
         });
 
         document.addEventListener('visibilitychange', async () => {
             if (document.hidden) { stopCamera(); return; }
             if (starting) await starting;
-            if (!document.hidden) startCamera();
+            if (!document.hidden && !document.getElementById('mainApp').classList.contains('hidden')) startCamera();
         });
         window.addEventListener('pagehide', stopCamera);
 
-        // ---------- Análisis ----------
         function analyzeSnapshot(baseData) {
             clearTimeout(analysisTimer);   
-
-            logBox.innerHTML = `
-                <div class="text-amber-400 font-bold text-xs flex items-center gap-2 mb-2">
-                    <i class="fa-solid fa-spinner fa-spin"></i> Procesando la foto de la mesa...
-                </div>
-                <div class="text-[11px] text-gray-400">Analizando Equity, GTO y umbrales de riesgo...</div>
-            `;
-
+            logBox.innerHTML = `<div class="text-amber-400 font-bold text-xs flex items-center gap-2 mb-2"><i class="fa-solid fa-spinner fa-spin"></i> Poker Arrow procesando la foto...</div><div class="text-[11px] text-gray-400">Analizando Equity, GTO y umbrales de riesgo...</div>`;
             analysisTimer = setTimeout(() => {
                 let hashFactor = 0;
-                for (let i = 0; i < Math.min(baseData.length, 1000); i++) {
-                    hashFactor = ((hashFactor << 5) - hashFactor) + baseData.charCodeAt(i);
-                    hashFactor |= 0;
-                }
+                for (let i = 0; i < Math.min(baseData.length, 1000); i++) { hashFactor = ((hashFactor << 5) - hashFactor) + baseData.charCodeAt(i); hashFactor |= 0; }
                 const exactWin = Math.abs(hashFactor % 55) + 25;
-
                 if (exactWin < 42) {
-                    logBox.innerHTML = `
-                        <div class="alert-pulse border border-red-500 rounded-xl p-2.5 mb-2 text-center">
-                            <div class="text-red-400 font-bold text-xs flex items-center justify-center gap-1">
-                                <i class="fa-solid fa-triangle-exclamation"></i> ¡ALERTA TEMPRANA: ALTO RIESGO DE PERDER!
-                            </div>
-                        </div>
-                        <div class="text-white font-semibold mb-1 text-xs">Probabilidad de Éxito: <span class="text-red-400 text-sm">${exactWin}%</span></div>
-                        <div class="text-[11px] text-gray-300 leading-relaxed space-y-1">
-• <strong>Bots 3 & 4 (Pot Odds / GTO):</strong> Margen matemático desfavorable.<br>
-• <strong>Bot 5 (Riesgo Crítico):</strong> Alta exposición frente a rivales.<br>
-• <strong>Bot 6 (Acción Sugerida):</strong> <strong class="text-red-400">RETIRARSE (FOLD)</strong> para blindar tu stack.
-                        </div>
-                    `;
+                    logBox.innerHTML = `<div class="alert-pulse border border-red-500 rounded-xl p-2.5 mb-2 text-center"><div class="text-red-400 font-bold text-xs flex items-center justify-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> ¡ALERTA TEMPRANA: ALTO RIESGO DE PERDER!</div></div><div class="text-white font-semibold mb-1 text-xs">Probabilidad de Éxito: <span class="text-red-400 text-sm">${exactWin}%</span></div><div class="text-[11px] text-gray-300 leading-relaxed space-y-1">• <strong>Bots 3 & 4 (Pot Odds / GTO):</strong> Margen matemático desfavorable.<br>• <strong>Bot 5 (Riesgo Crítico):</strong> Alta exposición frente a rivales.<br>• <strong>Bot 6 (Acción Sugerida):</strong> <strong class="text-red-400">RETIRARSE (FOLD)</strong> para blindar tu stack.</div>`;
                 } else {
-                    logBox.innerHTML = `
-                        <div class="text-emerald-400 font-bold text-xs flex items-center gap-1 mb-2">
-                            <i class="fa-solid fa-shield-halved"></i> ¡Análisis Objetivo Completado!
-                        </div>
-                        <div class="text-white font-semibold mb-1 text-xs">Probabilidad de Éxito: <span class="text-emerald-400 text-sm">${exactWin}%</span></div>
-                        <div class="text-[11px] text-gray-300 leading-relaxed space-y-1">
-• <strong>Bots 1 & 2 (OCR/Equity):</strong> Cartas y mesa leídas con precisión.<br>
-• <strong>Bots 3 & 4 (Pot Odds / GTO):</strong> Relación de apuesta favorable.<br>
-• <strong>Bot 6 (Sintetizador):</strong> ${exactWin > 60 ? 'Estrategia sólida. Continuar con agresión.' : 'Mano marginal. Controlar botes.'}
-                        </div>
-                    `;
+                    logBox.innerHTML = `<div class="text-emerald-400 font-bold text-xs flex items-center gap-1 mb-2"><i class="fa-solid fa-shield-halved"></i> ¡Análisis Objetivo Completado!</div><div class="text-white font-semibold mb-1 text-xs">Probabilidad de Éxito: <span class="text-emerald-400 text-sm">${exactWin}%</span></div><div class="text-[11px] text-gray-300 leading-relaxed space-y-1">• <strong>Bots 1 & 2 (OCR/Equity):</strong> Cartas y mesa leídas con precisión.<br>• <strong>Bots 3 & 4 (Pot Odds / GTO):</strong> Relación de apuesta favorable.<br>• <strong>Bot 6 (Sintetizador):</strong> ${exactWin > 60 ? 'Estrategia sólida. Continuar con agresión.' : 'Mano marginal. Controlar botes.'}</div>`;
                 }
             }, 1200);
         }
 
         function resetConsole() {
-            clearTimeout(analysisTimer);
-            fileInput.value = '';
-            
-            // Ocultamos la foto y dejamos que refreshUI devuelva el video en vivo
-            snapshot.removeAttribute('src');
-            snapshot.classList.add('hidden');
-            
-            refreshUI();
+            clearTimeout(analysisTimer); fileInput.value = ''; snapshot.removeAttribute('src'); snapshot.classList.add('hidden'); refreshUI();
             logBox.innerHTML = `<span class="text-center text-gray-500">Memoria borrada. Caché limpia. Listo para la siguiente jugada.</span>`;
         }
-
-        // ---------- Inicio ----------
-        if (useFallback) setStatus('Este navegador no permite la cámara en vivo: el botón usará la cámara del sistema.');
-        refreshUI();
-        startCamera();
     </script>
 </body>
 </html>
