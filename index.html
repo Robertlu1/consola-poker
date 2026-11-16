@@ -14,8 +14,6 @@
         .alert-pulse { animation: alertPulse 1s infinite; }
         @keyframes alertPulse { 0% { background-color: rgba(239, 68, 68, 0.2); } 50% { background-color: rgba(239, 68, 68, 0.5); } 100% { background-color: rgba(239, 68, 68, 0.2); } }
         
-        /* Con la cámara en vivo, la última captura se muestra como miniatura sobre el visor */
-        #viewer.live #snapshotPreview { position: absolute; right: 0.75rem; bottom: 0.75rem; width: 5rem; height: 3.5rem; border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 0.5rem; object-fit: cover; }
         .shutter-flash { animation: shutterFlash 0.25s ease-out; }
         @keyframes shutterFlash { from { opacity: 0.15; } to { opacity: 1; } }
     </style>
@@ -33,24 +31,30 @@
             </div>
         </div>
 
-        <!-- Disparador: un toque = una captura desde la cámara en vivo -->
+        <!-- Disparador y Controles -->
         <div class="glass-panel rounded-2xl p-3 mb-3 shadow-lg">
             <button type="button" id="shutterBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition active:scale-95 shadow-md border border-blue-400/30">
                 <i class="fa-solid fa-camera text-base"></i> <span id="shutterLabel">Activar Cámara</span>
             </button>
-            <p id="cameraStatus" class="hidden text-[10px] text-amber-400 text-center mt-2"></p>
+            
+            <!-- Botón para alternar Horizontal/Vertical -->
+            <div class="flex justify-center mt-3">
+                <button type="button" id="toggleViewBtn" class="text-[10px] text-blue-300 hover:text-white bg-blue-900/30 hover:bg-blue-800/50 border border-blue-500/30 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-minimize"></i> <span id="toggleViewText">Cambiar a Modo Horizontal</span>
+                </button>
+            </div>
 
-            <!-- Respaldo: solo se usa si el WebView no permite la cámara en vivo -->
+            <p id="cameraStatus" class="hidden text-[10px] text-amber-400 text-center mt-2"></p>
             <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
         </div>
 
-        <!-- Visor en vivo + última captura (FORMATO HORIZONTAL COMPACTO) -->
-        <div id="viewer" class="glass-panel rounded-2xl p-2 mb-3 relative overflow-hidden flex flex-col items-center justify-center h-36">
-            <video id="liveVideo" autoplay playsinline muted class="hidden w-full h-full object-cover bg-black rounded-xl"></video>
-            <img id="snapshotPreview" alt="Jugada en Mesa" class="hidden w-full h-full object-cover rounded-xl">
-            <div id="placeholderView" class="text-center text-gray-400 text-xs py-2">
+        <!-- Visor dinámico -->
+        <div id="viewer" class="glass-panel rounded-2xl p-2 mb-3 relative overflow-hidden flex flex-col items-center justify-center min-h-[140px] transition-all duration-300">
+            <video id="liveVideo" autoplay playsinline muted class="hidden w-full bg-black rounded-xl transition-all duration-300"></video>
+            <img id="snapshotPreview" alt="Jugada en Mesa" class="hidden w-full rounded-xl transition-all duration-300">
+            <div id="placeholderView" class="text-center text-gray-400 text-xs py-4">
                 <i class="fa-solid fa-eye text-xl text-slate-500 mb-1 block"></i>
-                <p>Visor en vivo. Toca el botón superior para capturar.</p>
+                <p>Consola lista para velocidad máxima.<br>Toca el botón superior para capturar.</p>
             </div>
         </div>
 
@@ -72,8 +76,8 @@
 
     <script>
         // ---------- Configuración ----------
-        const MAX_SIDE = 1600;        // lado mayor de la captura (px)
-        const JPEG_QUALITY = 0.85;    // calidad del JPEG en Base64
+        const MAX_SIDE = 1600;        
+        const JPEG_QUALITY = 0.85;    
         const CONSTRAINTS = {
             audio: false,
             video: { facingMode: { ideal: 'environment' }, width: { ideal: 1600 }, height: { ideal: 1200 } }
@@ -93,11 +97,35 @@
         let analysisTimer = null;
         let useFallback = !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 
+        // ---------- Lógica del Botón Horizontal/Vertical ----------
+        let isCompactView = false;
+        $('toggleViewBtn').addEventListener('click', () => {
+            isCompactView = !isCompactView;
+            const btnText = $('toggleViewText');
+            const icon = document.querySelector('#toggleViewBtn i');
+            
+            if (isCompactView) {
+                video.classList.add('h-48', 'object-cover');
+                snapshot.classList.add('h-48', 'object-cover');
+                btnText.textContent = "Cambiar a Modo Vertical";
+                icon.className = "fa-solid fa-maximize";
+            } else {
+                video.classList.remove('h-48', 'object-cover');
+                snapshot.classList.remove('h-48', 'object-cover');
+                btnText.textContent = "Cambiar a Modo Horizontal";
+                icon.className = "fa-solid fa-minimize";
+            }
+        });
+
         // ---------- Interfaz ----------
         function refreshUI() {
+            const hasSnapshot = !snapshot.classList.contains('hidden');
             viewer.classList.toggle('live', !!stream);
-            video.classList.toggle('hidden', !stream);
-            placeholder.classList.toggle('hidden', !!stream || !snapshot.classList.contains('hidden'));
+            
+            // Ocultar el video en vivo si no hay stream o si la FOTO ya está tomada
+            video.classList.toggle('hidden', !stream || hasSnapshot);
+            placeholder.classList.toggle('hidden', !!stream || hasSnapshot);
+            
             shutterLabel.textContent = live ? 'Capturar Jugada al Instante'
                 : useFallback ? 'Tomar Foto de la Mesa'
                 : starting ? 'Abriendo cámara…' : 'Activar Cámara';
@@ -173,7 +201,7 @@
 
         function onCameraError(err) {
             const reasons = {
-                NotAllowedError: 'Permiso de cámara denegado (revisa también el permiso de cámara de Telegram).',
+                NotAllowedError: 'Permiso de cámara denegado.',
                 SecurityError: 'El navegador bloqueó el acceso a la cámara.',
                 NotFoundError: 'No se encontró ninguna cámara.',
                 NotReadableError: 'La cámara está ocupada por otra app.',
@@ -198,15 +226,19 @@
         shutterBtn.addEventListener('click', () => {
             if (useFallback) { fileInput.click(); return; }   
             if (!live) { startCamera(); return; }
+            
+            // Si la foto ya está en pantalla, no hacer nada hasta que le den a "Limpiar"
+            if (!snapshot.classList.contains('hidden')) return;
+
             if (video.readyState < 2 || !video.videoWidth) {  
                 stopCamera();
                 startCamera();
                 return;
             }
             const dataUrl = toJpegDataUrl(video, video.videoWidth, video.videoHeight);
-            video.classList.remove('shutter-flash');
-            void video.offsetWidth;                            
-            video.classList.add('shutter-flash');
+            
+            // Ocultamos el video al instante de disparar y mostramos la foto grande
+            video.classList.add('hidden');
             showSnapshot(dataUrl);
             analyzeSnapshot(dataUrl);
         });
@@ -290,8 +322,11 @@
         function resetConsole() {
             clearTimeout(analysisTimer);
             fileInput.value = '';
+            
+            // Ocultamos la foto y dejamos que refreshUI devuelva el video en vivo
             snapshot.removeAttribute('src');
             snapshot.classList.add('hidden');
+            
             refreshUI();
             logBox.innerHTML = `<span class="text-center text-gray-500">Memoria borrada. Caché limpia. Listo para la siguiente jugada.</span>`;
         }
