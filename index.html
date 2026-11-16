@@ -13,9 +13,9 @@
         @keyframes pulseGlow { 0% { box-shadow: 0 0 5px #2ec4b6; } 50% { box-shadow: 0 0 20px #2ec4b6; } 100% { box-shadow: 0 0 5px #2ec4b6; } }
         .alert-pulse { animation: alertPulse 1s infinite; }
         @keyframes alertPulse { 0% { background-color: rgba(239, 68, 68, 0.2); } 50% { background-color: rgba(239, 68, 68, 0.5); } 100% { background-color: rgba(239, 68, 68, 0.2); } }
-
+        
         /* Con la cámara en vivo, la última captura se muestra como miniatura sobre el visor */
-        #viewer.live #snapshotPreview { position: absolute; right: 0.75rem; bottom: 0.75rem; width: 5rem; height: 3.5rem; border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 0.5rem; }
+        #viewer.live #snapshotPreview { position: absolute; right: 0.75rem; bottom: 0.75rem; width: 5rem; height: 3.5rem; border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 0.5rem; object-fit: cover; }
         .shutter-flash { animation: shutterFlash 0.25s ease-out; }
         @keyframes shutterFlash { from { opacity: 0.15; } to { opacity: 1; } }
     </style>
@@ -44,13 +44,13 @@
             <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
         </div>
 
-        <!-- Visor en vivo + última captura -->
-        <div id="viewer" class="glass-panel rounded-2xl p-2 mb-3 relative overflow-hidden flex flex-col items-center justify-center min-h-[140px]">
-            <video id="liveVideo" autoplay playsinline muted class="hidden w-full max-h-[40vh] object-contain bg-black rounded-xl"></video>
-            <img id="snapshotPreview" alt="Jugada en Mesa" class="hidden w-full h-36 object-cover rounded-xl">
-            <div id="placeholderView" class="text-center text-gray-400 text-xs py-4">
-                <i class="fa-solid fa-brain text-xl text-slate-500 mb-1"></i>
-                <p>Consola lista para velocidad máxima.<br>Toca el botón superior para capturar la jugada.</p>
+        <!-- Visor en vivo + última captura (FORMATO HORIZONTAL COMPACTO) -->
+        <div id="viewer" class="glass-panel rounded-2xl p-2 mb-3 relative overflow-hidden flex flex-col items-center justify-center h-36">
+            <video id="liveVideo" autoplay playsinline muted class="hidden w-full h-full object-cover bg-black rounded-xl"></video>
+            <img id="snapshotPreview" alt="Jugada en Mesa" class="hidden w-full h-full object-cover rounded-xl">
+            <div id="placeholderView" class="text-center text-gray-400 text-xs py-2">
+                <i class="fa-solid fa-eye text-xl text-slate-500 mb-1 block"></i>
+                <p>Visor en vivo. Toca el botón superior para capturar.</p>
             </div>
         </div>
 
